@@ -6,6 +6,8 @@ const LocalStrategy = require('passport-local').Strategy;
 const flash = require('connect-flash');
 const connectDB = require('./config/db');
 const User = require('./models/User');
+const MongoStore = require('connect-mongo');
+const mongoose = require('mongoose');
 
 const app = express();
 
@@ -22,9 +24,13 @@ app.use(express.static('public'));
 
 // Express session
 app.use(session({
-  secret: 'secret',
-  resave: true,
-  saveUninitialized: true
+  secret: process.env.SESSION_KEY,
+  resave: false,
+  saveUninitialized: true,
+  store: MongoStore.create({
+    mongoUrl: process.env.MONGODB_URI,  // Replace with your MongoDB URL
+    collectionName: 'sessions'
+  })
 }));
 
 // Passport middleware
